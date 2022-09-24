@@ -6,35 +6,48 @@ import io.micronaut.http.annotation.Body
 import io.micronaut.http.annotation.Controller
 import io.micronaut.http.annotation.Post
 import jakarta.inject.Inject
-import org.reactivestreams.Publisher
 
 class Message(
     val text: String
-){
+) {
 }
 
 class Event(
-    val replyToken: String,
-    val message: Message
-){
+    val type: String,
+    val replyToken: String?,
+    val message: Message?
+) {
 
 }
 
 class Notification(
     val destination: String,
     val events: List<Event>
-    ) {
+) {
 }
 
 @Controller("/") //
-class LineChannelController {
-
-    @Inject
-    lateinit var client: LineReplyClient
+class LineChannelController @Inject constructor(
+    val client: LineReplyClient,
+    val talker: Talker
+) {
 
     @Post
     @SingleResult
-    fun post(@Body text: Notification): Publisher<HttpResponse<*>> {
-       return client.reply(Reply(text.events.get(0).replyToken, listOf(MessageObject(text.events.get(0).message.text))))
+    suspend fun post(@Body text: Notification): HttpResponse<*> {
+        var response: HttpResponse<*>? = null
+        for (event in text.events) {
+            if (event.message != null && event.replyToken != null) {
+                val return_msgs = talker.getReply(event.message.text)
+                val reply = Reply(
+                    event.replyToken,
+                    return_msgs.map {
+                        MessageObject(it)
+                    }
+                )
+                response = client.reply(reply)
+            }
+        }
+        return if (response != null) response else HttpResponse.ok("")
     }
 }
