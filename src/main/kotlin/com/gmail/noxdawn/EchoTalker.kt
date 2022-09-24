@@ -2,13 +2,14 @@ package com.gmail.noxdawn
 
 import io.vertx.reactivex.pgclient.PgPool
 import jakarta.inject.Inject
+import jakarta.inject.Named
 import jakarta.inject.Singleton
 import kotlinx.coroutines.rx2.await
 import org.slf4j.LoggerFactory
 
 @Singleton
 class EchoTalker @Inject constructor(
-    val pgPool: PgPool
+    @param:Named("ssl") val pgPool: PgPool
 ) : Talker {
     private val logger = LoggerFactory.getLogger(EchoTalker::class.java)
 
