@@ -3,6 +3,7 @@ package com.gmail.noxdawn
 import io.micronaut.configuration.vertx.pg.client.PgClientConfiguration
 import io.micronaut.configuration.vertx.pg.client.PgClientFactory
 import io.micronaut.context.annotation.Factory
+import io.vertx.core.net.KeyStoreOptions
 import io.vertx.pgclient.SslMode
 import io.vertx.reactivex.pgclient.PgPool
 import jakarta.inject.Inject
@@ -13,7 +14,8 @@ import jakarta.inject.Singleton
 class PgPoolFactory @Inject constructor(connectionConfiguration: PgClientConfiguration, private val factory: PgClientFactory) {
     init {
         connectionConfiguration.connectOptions?.also {
-            it.sslMode = SslMode.REQUIRE
+            it.sslMode = SslMode.VERIFY_CA
+            it.trustOptions = KeyStoreOptions()
         }
     }
 
