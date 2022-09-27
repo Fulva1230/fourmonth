@@ -22,7 +22,6 @@ class PgPoolFactory @Inject constructor(private val connectionConfiguration: PgC
     fun sslPgPool(): PgPool {
         connectionConfiguration.connectOptions?.also {
             val local_uri = URI(this.uri)
-            print(local_uri)
             it.host = local_uri.host
             it.port = local_uri.port
             it.user = local_uri.userInfo.split(":")[0]

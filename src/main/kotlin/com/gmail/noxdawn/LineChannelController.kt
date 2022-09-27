@@ -41,9 +41,18 @@ class LineChannelController @Inject constructor(
                 val return_msgs = talker.getReply(event.message.text)
                 val reply = Reply(
                     event.replyToken,
-                    return_msgs.map {
-                        MessageObject(it)
-                    }
+                    return_msgs.reply.map {
+                        Reply.MessageObject(it)
+                    },
+                    Reply.QuickReply(return_msgs.hints.map {
+                        Reply.QuickReply.Item(
+                            Reply.QuickReply.Item.Action(
+                                "message",
+                                it,
+                                it
+                            )
+                        )
+                    })
                 )
                 response = client.reply(reply)
             }

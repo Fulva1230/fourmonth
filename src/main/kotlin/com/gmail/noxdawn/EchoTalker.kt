@@ -13,16 +13,23 @@ class EchoTalker @Inject constructor(
 ) : Talker {
     private val logger = LoggerFactory.getLogger(EchoTalker::class.java)
 
-    override suspend fun getReply(msg: String): List<String> {
+    override suspend fun getReply(msg: String): TextReply {
         var text_to = "我不知道要說什麼"
-        if(msg.length > 0){
-            val from_message_info = pgPool.query("SELECT reply_id FROM message_from WHERE text='$msg'").rxExecute().await()
+        val hints = mutableListOf<String>("Hi")
+        if (msg.length > 0) {
+            val from_message_info =
+                pgPool.query("SELECT reply_id FROM message_from WHERE text='$msg'").rxExecute().await()
             val message_to_id = from_message_info.firstOrNull()?.getInteger("reply_id")
-            if(message_to_id != null){
-                val to_message_info = pgPool.query("SELECT text FROM message_to WHERE id=$message_to_id").rxExecute().await()
+            if (message_to_id != null) {
+                val to_message_info =
+                    pgPool.query("SELECT text, hints FROM message_to WHERE id=$message_to_id").rxExecute().await()
                 text_to = to_message_info.first().get(String::class.java, "text")
+                hints += to_message_info.first().getArrayOfStrings("hints")
             }
         }
-        return listOf("xdd", text_to)
+        return TextReply(
+            listOf("xdd", text_to),
+            hints.toList()
+        )
     }
 }
