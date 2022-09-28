@@ -15,7 +15,7 @@ class EchoTalker @Inject constructor(
 
     override suspend fun getReply(msg: String): TextReply {
         var text_to = "我不知道要說什麼"
-        val hints = mutableListOf<String>("Hi")
+        val hints = mutableListOf<String>()
         if (msg.length > 0) {
             val from_message_info =
                 pgPool.query("SELECT reply_id FROM message_from WHERE text='$msg'").rxExecute().await()
@@ -28,7 +28,7 @@ class EchoTalker @Inject constructor(
             }
         }
         return TextReply(
-            listOf("xdd", text_to),
+            listOf(text_to),
             hints.toList()
         )
     }
