@@ -17,12 +17,8 @@ class EchoTalker @Inject constructor(
         var text_to = "我不知道要說什麼"
         val hints = mutableListOf<String>()
         if (msg.length > 0) {
-            val from_message_info =
-                pgPool.query("SELECT reply_id FROM message_from WHERE text='$msg'").rxExecute().await()
-            val message_to_id = from_message_info.firstOrNull()?.getInteger("reply_id")
-            if (message_to_id != null) {
-                val to_message_info =
-                    pgPool.query("SELECT text, hints FROM message_to WHERE id=$message_to_id").rxExecute().await()
+            val to_message_info = pgPool.query("SELECT message_to.text, message_to.hints FROM message_from JOIN message_to ON message_from.reply_id = message_to.id WHERE message_from.text='$msg'").rxExecute().await()
+            if(to_message_info.size() > 0){
                 text_to = to_message_info.first().get(String::class.java, "text")
                 hints += to_message_info.first().getArrayOfStrings("hints")
             }
