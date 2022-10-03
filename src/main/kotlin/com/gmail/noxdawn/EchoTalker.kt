@@ -1,10 +1,10 @@
 package com.gmail.noxdawn
 
-import io.vertx.reactivex.pgclient.PgPool
+import io.vertx.kotlin.coroutines.await
+import io.vertx.pgclient.PgPool
 import jakarta.inject.Inject
 import jakarta.inject.Named
 import jakarta.inject.Singleton
-import kotlinx.coroutines.rx2.await
 import org.slf4j.LoggerFactory
 
 @Singleton
@@ -17,7 +17,7 @@ class EchoTalker @Inject constructor(
         var text_to = "我不知道要說什麼"
         val hints = mutableListOf<String>()
         if (msg.length > 0) {
-            val to_message_info = pgPool.query("SELECT message_to.text, message_to.hints FROM message_from JOIN message_to ON message_from.reply_id = message_to.id WHERE message_from.text='$msg'").rxExecute().await()
+            val to_message_info = pgPool.query("SELECT message_to.text, message_to.hints FROM message_from JOIN message_to ON message_from.reply_id = message_to.id WHERE message_from.text='$msg'").execute().await()
             if(to_message_info.size() > 0){
                 text_to = to_message_info.first().get(String::class.java, "text")
                 hints += to_message_info.first().getArrayOfStrings("hints")

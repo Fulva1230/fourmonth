@@ -1,38 +1,38 @@
 package com.gmail.noxdawn
 
-import io.micronaut.configuration.vertx.pg.client.PgClientConfiguration
-import io.micronaut.configuration.vertx.pg.client.PgClientFactory
 import io.micronaut.context.annotation.Factory
 import io.micronaut.context.annotation.Value
-import io.vertx.core.net.KeyStoreOptions
+import io.vertx.pgclient.PgConnectOptions
+import io.vertx.pgclient.PgPool
 import io.vertx.pgclient.SslMode
-import io.vertx.reactivex.pgclient.PgPool
-import jakarta.inject.Inject
+import io.vertx.sqlclient.PoolOptions
 import jakarta.inject.Named
 import jakarta.inject.Singleton
 import java.net.URI
 
+
 @Factory
-class PgPoolFactory @Inject constructor(private val connectionConfiguration: PgClientConfiguration, private val factory: PgClientFactory) {
+class PgPoolFactory {
     @Value("\${database.uri}")
     lateinit var uri: String
 
     @Singleton
     @Named("ssl")
     fun sslPgPool(): PgPool {
-        connectionConfiguration.connectOptions?.also {
-            val local_uri = URI(this.uri)
-            it.host = local_uri.host
-            it.port = local_uri.port
-            it.user = local_uri.userInfo.split(":")[0]
-            it.password = local_uri.userInfo.split(":")[1]
-            it.database = local_uri.path.substring(1)
-            it.sslMode = SslMode.VERIFY_CA
-            it.isSsl = true
-            it.isTrustAll = true
-            it.trustOptions = KeyStoreOptions()
-        }
+        val local_uri = URI(this.uri)
+        val connectOptions = PgConnectOptions()
+            .setPort(local_uri.port)
+            .setHost(local_uri.host)
+            .setDatabase(local_uri.path.substring(1))
+            .setUser(local_uri.userInfo.split(":")[0])
+            .setPassword(local_uri.userInfo.split(":")[1])
+            .setSsl(true)
+            .setTrustAll(true)
+            .setSslMode(SslMode.PREFER)
 
-        return factory.client()
+        val poolOptions = PoolOptions()
+            .setMaxSize(5)
+
+        return PgPool.pool(connectOptions, poolOptions)
     }
 }

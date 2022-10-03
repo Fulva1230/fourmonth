@@ -19,7 +19,6 @@ dependencies {
     implementation("io.micronaut:micronaut-http-client")
     implementation("io.micronaut:micronaut-jackson-databind")
     implementation("io.micronaut.kotlin:micronaut-kotlin-runtime")
-    implementation("io.micronaut.sql:micronaut-vertx-pg-client")
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("io.micronaut.rxjava3:micronaut-rxjava3")
     implementation("io.micronaut.rxjava3:micronaut-rxjava3-http-client")
@@ -29,6 +28,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-rx3:1.6.4")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-rx2:1.6.4")
     implementation("com.ongres.scram:client:2.1")
+    implementation("io.vertx:vertx-pg-client:4.3.4")
+    implementation("io.vertx:vertx-lang-kotlin-coroutines:4.3.4")
 
     runtimeOnly("ch.qos.logback:logback-classic")
     implementation("io.micronaut:micronaut-validation")
